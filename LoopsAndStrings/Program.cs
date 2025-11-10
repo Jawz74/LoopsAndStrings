@@ -6,7 +6,7 @@ namespace LoopsAndStrings
     {
         static void Main(string[] args)
         {
-            MainProgram.Run();
+            MainProgram.RunMainMenu();
         }
     }
 }

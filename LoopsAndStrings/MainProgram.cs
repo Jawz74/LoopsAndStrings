@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LoopsAndStrings.Helpers;
+using LoopsAndStrings.Utilities;
 
 namespace LoopsAndStrings
 {
     internal static class MainProgram
     {
-        internal static void Run()
+        //Skriver ut programmets huvudmeny.
+        internal static void RunMainMenu()
         {            
             string? menuChoice;
             bool exitMenu = false;
@@ -31,7 +33,7 @@ namespace LoopsAndStrings
                         exitMenu = true;
                         break;
                     case "1":
-                        DisplayCinemaMenu();
+                        RunCinemaMenu();
                         break;
                     case "2":
                         PrintUserInputX10();
@@ -40,7 +42,7 @@ namespace LoopsAndStrings
                         PrintWordNoThree();
                         break;
                     default:
-                        Console.WriteLine("Felaktig input. Försök igen.");
+                        Console.WriteLine("Felaktigt val. Försök igen.");
                         break;
                 }
             } while (!exitMenu);
@@ -48,13 +50,15 @@ namespace LoopsAndStrings
             Console.WriteLine("Programmet avslutas");
         }
 
-        private static void DisplayCinemaMenu()
+        //Skriver ut en meny för att räkna ut biobiljettpris (enkel- eller gruppbiljett).
+        private static void RunCinemaMenu()
         {
             string? menuChoice;
             bool exitMenu = false;
-
+            
             do
             {
+                Console.WriteLine();
                 Console.WriteLine("--------------- Biomeny ----------------");
                 Console.WriteLine($"Välj genom att ange en siffra.{Environment.NewLine}");
                 Console.WriteLine("1 - Räkna ut priset för en besökare.");
@@ -69,115 +73,84 @@ namespace LoopsAndStrings
                         exitMenu = true;
                         break;
                     case "1":
-                        SingleTickets();
+                        BuySingleTickets();
                         break;
                     case "2":
-                        GroupTickets();
+                        BuyGroupTickets();
                         break;
                     default:
-                        Console.WriteLine("Felaktig input. Försök igen.");
+                        Console.WriteLine("Felaktigt val. Försök igen.");
                         break;
                 }
             } while (!exitMenu);
+
+            Console.WriteLine();
         }
-
-
-        //Upprepar en användares inmatade text tio gånger, utan radbrytning
-        private static void PrintUserInputX10()
-        {
-            Console.WriteLine($"{Environment.NewLine}Ange text som ska skrivas ut 10 gånger:");
-            string? userInput = Console.ReadLine();                       // Todo: Lägg till helper som hanterar tom sträng
-
-            for (int i = 1; i <= 10; i++)
-            {
-                Console.Write($"{i}. {userInput}");
-
-                if (i != 10)
-                    Console.Write(", "); // Mellanslag och komma läggs på angiven text i alla utskrifter utom sista (i==10)
-            }
-
-            Console.WriteLine($"{ Environment.NewLine}");
-        }
-
-
-        //Skriver ut det tredje ordet i en mening   
-        public static void PrintWordNoThree()
+                       
+        private static void BuyGroupTickets()
         {
             bool success;
-            string[]? wordArray;
+            int noOfCustomers;
+            uint age;
+            decimal totalGroupPrice = 0;
 
+            Console.WriteLine("Hur många är ni i sällskapet?");
+            
             do
             {
-                Console.WriteLine($"{Environment.NewLine}Ange en mening på minst 3 ord:");
-                wordArray = Console.ReadLine()?.Split(' ');
-                success = wordArray?.Length >= 3;
+                success = Helper.CheckNoOfCustomers(Console.ReadLine(), 2, 20, out noOfCustomers);
 
                 if (!success)
-                    Console.WriteLine("Felaktig inmatning. Försök igen.");
+                    Console.WriteLine("Felaktigt antal personer. Försök igen.");
 
             } while (!success);
 
-            Console.WriteLine($"Det tredje ordet i meningen är {wordArray?[2]} {Environment.NewLine}{Environment.NewLine}");
-
-        }
-
-
-        private static void GroupTickets()
-        {
-            bool success;
-            Console.WriteLine("Hur många är ni i sällskapet?");
-            int.TryParse(Console.ReadLine(), out int noOfCustomers);  // Todo: Flytta till Helpers.CheckNoOfCustomers
-            int counter = 0, age;
-            decimal totalGroupPrice = 0;
-
-            while (noOfCustomers > 0)
-            {
-                counter++;
-                do
+            for (int customerCount = 1; customerCount <= noOfCustomers; customerCount++)
+            {  
+               do
                 { 
-                    Console.WriteLine($"Ange ålder på person {counter}:");
-                    success = InputHelpers.CheckAgeInput(Console.ReadLine(), 0, 120, out age);
+                    Console.WriteLine($"Ange ålder på person nr {customerCount}:");
+                    success = Helper.CheckAgeInput(Console.ReadLine(), 0, 120, out age);
                     if (!success)
-                        Console.WriteLine("Felaktigt val. Försök igen.");
+                        Console.WriteLine("Felaktig ålder. Försök igen.");
                 } while (!success);
 
-                totalGroupPrice += GetTicketPriceByAge(age);
-                noOfCustomers--;
+                totalGroupPrice += Helper.GetTicketPriceByAge(age);                
             }
 
-            Console.WriteLine($"Antal personer: {counter}. Totalpris: {totalGroupPrice}");
+            Console.WriteLine($"Antal personer: {noOfCustomers}. Totalpris: {totalGroupPrice} {Environment.NewLine}");
         }
 
-        static void SingleTickets()
+        static void BuySingleTickets()
         {
-            const int minAge = 0, maxAge = 120;
+            const uint minAge = 0, maxAge = 120;
             bool success;
-            int age;
+            uint age;
 
             // Loopa tills angiven ålder är giltig
             do
             {
                 Console.WriteLine("Ange ålder:");
-                success = InputHelpers.CheckAgeInput(Console.ReadLine(), minAge, maxAge, out age);
+                success = Helper.CheckAgeInput(Console.ReadLine(), minAge, maxAge, out age);
                 if (!success)
-                    Console.WriteLine("Felaktigt val. Försök igen."); //Todo: Lägga denna i CheckAgeInput() istället?
+                    Console.WriteLine("Felaktig ålder. Försök igen."); 
             } while (!success);
 
-            decimal ticketPrice = GetTicketPriceByAge(age);
+            decimal ticketPrice = Helper.GetTicketPriceByAge(age);
 
             if (age < 20)
             {
-                if (age <= 5)
+                if (age < 5)
                     Console.WriteLine($"Barnpris: {ticketPrice} kr");
                 else
                     Console.WriteLine($"Ungdomspris: {ticketPrice} kr");
             }
             else if (age > 64)
             {
-                if (age <= 100)
-                    Console.WriteLine($"Pensionärspris: {ticketPrice} kr");
-                else
+                if (age > 100)
                     Console.WriteLine($"Åldringspris: {ticketPrice} kr");
+                else
+                    Console.WriteLine($"Pensionärspris: {ticketPrice} kr");
             }
             else
             {
@@ -187,27 +160,54 @@ namespace LoopsAndStrings
             Console.WriteLine();
         }
 
-        private static decimal GetTicketPriceByAge(int age)
+        //Upprepar en användares inmatade text tio gånger, utan radbrytning
+        private static void PrintUserInputX10()
         {
-            switch (age)
+            bool success;
+            string? userInput;
+
+            // Loopa tills användaren matat in en giltig input (validerad genom metod i utilities-klass)
+            do
             {
-                case < 20:
-                    switch (age)
-                    {
-                        case < 5:
-                            return 0;
-                    }
-                    return 80;
-                case > 64:
-                    switch (age)
-                    {
-                        case > 100:
-                            return 0;
-                    }
-                    return 90;
-                default:
-                    return 120;
+                Console.WriteLine($"{Environment.NewLine}Ange text som ska skrivas ut 10 gånger:");
+                userInput = Console.ReadLine();
+                success = Utils.IsStringValidText(userInput, false);
+                if (!success)
+                    Console.WriteLine("Felaktig text. Försök igen.");
+
+            } while (!success);
+
+            // Skriv ut användarens inmatade text 10 gånger, visa räknaren i output.
+            for (int i = 1; i <= 10; i++)
+            {
+                Console.Write($"{i}. {userInput}");
+
+                if (i != 10)
+                    Console.Write(", "); // Mellanslag och komma läggs på angiven text i alla utskrifter utom sista (i==10)
             }
+
+            Console.WriteLine($"{Environment.NewLine}");
+        }
+
+
+        //Skriver ut det tredje ordet i en mening   
+        public static void PrintWordNoThree()
+        {
+            bool success;
+            string? thirdWord;
+
+            // Loopa tills användaren matat in en giltig input (kollen görs i FindNthWordInSentence())
+            do
+            {
+                Console.WriteLine($"{Environment.NewLine}Ange en mening på minst 3 ord:");
+                success = Utils.FindNthWordInSentence(Console.ReadLine(), 3, out thirdWord);
+
+                if (!success)
+                    Console.WriteLine("Felaktig inmatning. Försök igen.");
+
+            } while (!success);
+
+            Console.WriteLine($"Det tredje ordet i meningen är '{thirdWord}' {Environment.NewLine}{Environment.NewLine}");
         }
     }
 }

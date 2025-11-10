@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LoopsAndStrings.Helpers\LoopsAndStrings.Helpers.csproj" />
+    <ProjectReference Include="..\LoopsAndStrings.Utilities\LoopsAndStrings.Utilities.csproj" />
   </ItemGroup>
 
 </Project>
