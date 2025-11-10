@@ -50,7 +50,7 @@ namespace LoopsAndStrings.Utilities
             {
                 resultText.Append($"{i}. {textToRepeat}");
 
-                if (i != 10)
+                if (i != noOfIterations)
                     resultText.Append(", "); // Mellanslag och komma läggs på inmatad text i alla utskrifter utom sista (i==10)
             }
 

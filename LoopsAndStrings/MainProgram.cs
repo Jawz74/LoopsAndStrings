@@ -90,7 +90,7 @@ namespace LoopsAndStrings
             Console.Clear();
         }
 
-        static void BuySingleTickets()
+        private static void BuySingleTickets()
         {
             uint age;
             
@@ -173,7 +173,7 @@ namespace LoopsAndStrings
 
 
         //Skriver ut det tredje ordet i en mening   
-        public static void PrintWordNoThree()
+        private static void PrintWordNoThree()
         {
             bool success;
             string? thirdWord;
