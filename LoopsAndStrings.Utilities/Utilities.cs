@@ -1,8 +1,10 @@
-﻿namespace LoopsAndStrings.Utilities
+﻿using System.Text;
+
+namespace LoopsAndStrings.Utilities
 {
     // Utility-klasser innehåller allmänna funktioner som kan användas i flera projekt.
     // Specialfall av en helper-klass. Har bara static metoder.
-    public static class Utils
+    public static class StringUtils
     {
         public static bool FindNthWordInSentence(string? sentence, uint wordNo, out string? nthWord)
         {
@@ -32,11 +34,27 @@
         public static bool IsStringValidText(string? text, bool allowEmptyOrBlanksOnly = false)
         {
             // Om Ctrl + z har matats in är text==null, dvs inte en sträng 
-            if (!(text is string))
+            if (text is null)
                 return false;
 
-            // Blir false endast om text är tom ("") eller bara blanksteg, fastän det inte tillåts. Annars true.
+            // Blir false endast när text är tom ("") el. bara blanksteg och detta inte tillåts. Annars true.
             return !allowEmptyOrBlanksOnly && string.IsNullOrEmpty(text.Trim()) ? false : true;
         }
-    }
+
+        // Sätter ihop en sträng med inmatad text, godtyckligt antal gånger. Räknaren visas även i texten.
+        public static string RepeatText(string? textToRepeat, uint noOfIterations)
+        {
+            StringBuilder resultText = new StringBuilder();
+
+            for (int i = 1; i <= noOfIterations; i++)
+            {
+                resultText.Append($"{i}. {textToRepeat}");
+
+                if (i != 10)
+                    resultText.Append(", "); // Mellanslag och komma läggs på inmatad text i alla utskrifter utom sista (i==10)
+            }
+
+            return resultText.ToString();
+        }
+}
 }

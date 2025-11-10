@@ -1,10 +1,11 @@
-﻿using System;
+﻿using LoopsAndStrings.Helpers;
+using LoopsAndStrings.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LoopsAndStrings.Helpers;
-using LoopsAndStrings.Utilities;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LoopsAndStrings
 {
@@ -17,7 +18,7 @@ namespace LoopsAndStrings
             bool exitMenu = false;
 
             do
-            {
+            {                
                 Console.WriteLine("--------------- Huvudmeny ----------------");
                 Console.WriteLine($"Välj genom att ange en siffra.{Environment.NewLine}");
                 Console.WriteLine("1 - Räkna ut priset för biobesök.");
@@ -33,7 +34,7 @@ namespace LoopsAndStrings
                         exitMenu = true;
                         break;
                     case "1":
-                        RunCinemaMenu();
+                        ShowCinemaMenu();
                         break;
                     case "2":
                         PrintUserInputX10();
@@ -47,18 +48,20 @@ namespace LoopsAndStrings
                 }
             } while (!exitMenu);
 
+            Console.Clear();
             Console.WriteLine("Programmet avslutas");
         }
 
         //Skriver ut en meny för att räkna ut biobiljettpris (enkel- eller gruppbiljett).
-        private static void RunCinemaMenu()
+        private static void ShowCinemaMenu()
         {
             string? menuChoice;
             bool exitMenu = false;
-            
+
+            Console.Clear();
+
             do
             {
-                Console.WriteLine();
                 Console.WriteLine("--------------- Biomeny ----------------");
                 Console.WriteLine($"Välj genom att ange en siffra.{Environment.NewLine}");
                 Console.WriteLine("1 - Räkna ut priset för en besökare.");
@@ -73,7 +76,7 @@ namespace LoopsAndStrings
                         exitMenu = true;
                         break;
                     case "1":
-                        BuySingleTickets();
+                        BuySingleTickets();                        
                         break;
                     case "2":
                         BuyGroupTickets();
@@ -84,59 +87,16 @@ namespace LoopsAndStrings
                 }
             } while (!exitMenu);
 
-            Console.WriteLine();
-        }
-                       
-        private static void BuyGroupTickets()
-        {
-            bool success;
-            int noOfCustomers;
-            uint age;
-            decimal totalGroupPrice = 0;
-
-            Console.WriteLine("Hur många är ni i sällskapet?");
-            
-            do
-            {
-                success = Helper.CheckNoOfCustomers(Console.ReadLine(), 2, 20, out noOfCustomers);
-
-                if (!success)
-                    Console.WriteLine("Felaktigt antal personer. Försök igen.");
-
-            } while (!success);
-
-            for (int customerCount = 1; customerCount <= noOfCustomers; customerCount++)
-            {  
-               do
-                { 
-                    Console.WriteLine($"Ange ålder på person nr {customerCount}:");
-                    success = Helper.CheckAgeInput(Console.ReadLine(), 0, 120, out age);
-                    if (!success)
-                        Console.WriteLine("Felaktig ålder. Försök igen.");
-                } while (!success);
-
-                totalGroupPrice += Helper.GetTicketPriceByAge(age);                
-            }
-
-            Console.WriteLine($"Antal personer: {noOfCustomers}. Totalpris: {totalGroupPrice} {Environment.NewLine}");
+            Console.Clear();
         }
 
         static void BuySingleTickets()
         {
-            const uint minAge = 0, maxAge = 120;
-            bool success;
             uint age;
+            
+            age = GetValidAgeInput();
 
-            // Loopa tills angiven ålder är giltig
-            do
-            {
-                Console.WriteLine("Ange ålder:");
-                success = Helper.CheckAgeInput(Console.ReadLine(), minAge, maxAge, out age);
-                if (!success)
-                    Console.WriteLine("Felaktig ålder. Försök igen."); 
-            } while (!success);
-
-            decimal ticketPrice = Helper.GetTicketPriceByAge(age);
+            decimal ticketPrice = CinemaHelper.GetTicketPriceByAge(age);
 
             if (age < 20)
             {
@@ -160,6 +120,34 @@ namespace LoopsAndStrings
             Console.WriteLine();
         }
 
+        private static void BuyGroupTickets()
+        {
+            bool success;
+            int noOfCustomers;
+            uint age;
+            decimal totalGroupPrice = 0;
+
+            Console.WriteLine("Hur många är ni i sällskapet?");
+            
+            do
+            {
+                success = CinemaHelper.CheckNoOfCustomers(Console.ReadLine(), 2, 20, out noOfCustomers);
+
+                if (!success)
+                    Console.WriteLine("Felaktigt antal personer. Försök igen.");
+
+            } while (!success);
+
+            for (int customerCount = 1; customerCount <= noOfCustomers; customerCount++)
+            {  
+               age = GetValidAgeInput($"Ange ålder på person nr { customerCount}:");
+               totalGroupPrice += CinemaHelper.GetTicketPriceByAge(age);                
+            }
+
+            Console.WriteLine($"Antal personer: {noOfCustomers}. Totalpris: {totalGroupPrice} {Environment.NewLine}");
+        }
+               
+
         //Upprepar en användares inmatade text tio gånger, utan radbrytning
         private static void PrintUserInputX10()
         {
@@ -171,20 +159,14 @@ namespace LoopsAndStrings
             {
                 Console.WriteLine($"{Environment.NewLine}Ange text som ska skrivas ut 10 gånger:");
                 userInput = Console.ReadLine();
-                success = Utils.IsStringValidText(userInput, false);
+                success = StringUtils.IsStringValidText(userInput, false);
                 if (!success)
                     Console.WriteLine("Felaktig text. Försök igen.");
 
             } while (!success);
 
             // Skriv ut användarens inmatade text 10 gånger, visa räknaren i output.
-            for (int i = 1; i <= 10; i++)
-            {
-                Console.Write($"{i}. {userInput}");
-
-                if (i != 10)
-                    Console.Write(", "); // Mellanslag och komma läggs på angiven text i alla utskrifter utom sista (i==10)
-            }
+            Console.WriteLine(StringUtils.RepeatText(userInput, 10));
 
             Console.WriteLine($"{Environment.NewLine}");
         }
@@ -200,7 +182,7 @@ namespace LoopsAndStrings
             do
             {
                 Console.WriteLine($"{Environment.NewLine}Ange en mening på minst 3 ord:");
-                success = Utils.FindNthWordInSentence(Console.ReadLine(), 3, out thirdWord);
+                success = StringUtils.FindNthWordInSentence(Console.ReadLine(), 3, out thirdWord);
 
                 if (!success)
                     Console.WriteLine("Felaktig inmatning. Försök igen.");
@@ -208,6 +190,26 @@ namespace LoopsAndStrings
             } while (!success);
 
             Console.WriteLine($"Det tredje ordet i meningen är '{thirdWord}' {Environment.NewLine}{Environment.NewLine}");
+        }
+
+        // Metoden är garanterad att returnera en giltig ålder
+        // TODO: Bör ligga i helper-klass, men Console.WriteLine() och .ReadLine() och gör den då svår att testa.
+        private static uint GetValidAgeInput(string prompt = "Ange ålder:", string errorMessage = "Felaktig ålder. Försök igen:")
+        {
+            uint age;
+            bool success;
+            const uint minAge = 0, maxAge = 120;  // TODO: Ska man lägga dessa konstanter mer centralt? Enum:uint funkar inte i jämförelser med uint 
+
+            // Loopa tills angiven ålder är giltig
+            do
+            {
+                Console.WriteLine(prompt);
+                success = CinemaHelper.CheckAgeInput(Console.ReadLine(), minAge, maxAge, out age);
+                if (!success)
+                    Console.WriteLine(errorMessage);
+            } while (!success);
+
+            return age;
         }
     }
 }
